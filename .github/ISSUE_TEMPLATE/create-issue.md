@@ -1,6 +1,6 @@
 ---
-name: "[FEAT] {Title}"
-about: Describe this issue template's purpose here.
+name: Create Issue
+about: Issue
 title: ''
 labels: ''
 assignees: ''
