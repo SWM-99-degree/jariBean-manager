@@ -1,0 +1,15 @@
+/* Variables and mixins declared here will be available in all other SCSS files */
+@import "bootstrap/scss/functions";/* Override Bootstrap's variables here */
+
+$primary: #F8963E;
+$secondary: #FFF2DF;
+$light: #F2F2F2;
+$white: #fff;
+
+$font-family-sans-serif: "Noto Sans Korean";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities"
+
