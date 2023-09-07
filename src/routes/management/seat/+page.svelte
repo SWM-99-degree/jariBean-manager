@@ -1,5 +1,5 @@
 <script>
-import TableList from "../../component/reserv/tableList.svelte";
+import TableList from "../../../component/reserv/tableList.svelte";
 
 </script>
 <div class="row  ">
