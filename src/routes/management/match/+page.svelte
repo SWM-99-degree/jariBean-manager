@@ -1,5 +1,5 @@
 <script>
-	import MatchList from './../../component/match/matchList.svelte';
+	import MatchList from '../../../component/match/matchList.svelte';
 
 </script>
 <div class="row">

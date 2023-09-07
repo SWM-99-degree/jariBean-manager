@@ -1,10 +1,10 @@
 <script lang="ts">
-import "../app.scss";
+import "../../app.scss";
 import GoogleFont, { getFontStyle } from "@svelte-web-fonts/google";
 import type { GoogleFontDefinition, GoogleFontVariant } from "@svelte-web-fonts/google";
 
-import NavBar from "./nav.svelte";
-import Sidebar from "./sidebar.svelte";
+import NavBar from "../nav.svelte";
+import Sidebar from "../sidebar.svelte";
 
 
 const fonts: GoogleFontDefinition[] = [
