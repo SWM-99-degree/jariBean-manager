@@ -1,6 +1,6 @@
 <script>
 	import manager from "../store/manager";
-  let managerInfo ;
+  let managerInfo;
   manager.subscribe((obj)=>{
     managerInfo = obj;
   });
