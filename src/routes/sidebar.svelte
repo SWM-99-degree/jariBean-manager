@@ -5,10 +5,14 @@
         faCalendarCheck,
         faCircle,
     } from "@fortawesome/free-solid-svg-icons";
+    import { Queue, matching } from "../store/requestQueue";
     import currentToken from "../store/firebase";
     import { onMount } from "svelte";
     import { initializeApp } from "firebase/app";
     import { getMessaging, getToken, onMessage } from "firebase/messaging";
+    import MatchingAddModal from '../component/matchingAddModal.svelte';
+    
+
 
     const firebaseConfig = {
         apiKey: "AIzaSyCRGiwGkiatM1kHnKWfd0tXceWHWJxiWRA",
@@ -19,8 +23,10 @@
         appId: "1:508384819940:web:f14eda8ab95a047e19caf1",
         measurementId: "G-CQJ8KGXR9L",
     };
-    let token;
 
+    let userId;
+    let number;
+    let token;
     onMount(async () => {
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
@@ -42,8 +48,7 @@
             .catch((err) => {
                 console.log("An error occurred while retrieving token. ", err);
             });
-        
-        
+
         if (token) {
             console.log(token);
             sendTokenToServer(token);
@@ -51,15 +56,34 @@
             setTokenSentToServer(false);
         }
 
-        messaging.onMessage(message, ((payload) => {
-    		// Firebase 메시지를 수신하고 처리
-    		console.log("Message received. ", payload);
-    		// 여기서 원하는 작업을 수행하세요.
-    }));
+        onMessage(messaging, (payload) => {
+            console.log("Message received. ", payload);
+            Queue.enqueue(payload.notification.title, payload.notification.body);
+            checkingTab();
+            // onShowPopup();
+            // 알림을 생성하거나 사용자 정의 로직을 수행합니다.
+        });
+
     });
+    function sleep(ms) {
+        const wakeUpTime = Date.now() + ms;
+        while (Date.now() < wakeUpTime) {}
+    }
 
+    function checkingTab(){
+        while (Queue.isempty() == false)  {
+            Queue.dequeue();
+            let q;
+            matching.subscribe((obj)=> q = obj)
+            console.log(q);
+            userId = q.userid;
+            number = q.number;
+            sleep(5000);
+            onShowPopup();
+            console.log("loof end");
+        }
+    }
     
-
 
     function sendTokenToServer(currentToken) {
         if (!isTokenSentToServer()) {
@@ -78,9 +102,32 @@
     function setTokenSentToServer(sent) {
         window.localStorage.setItem("sentToServer", sent ? "1" : "0");
     }
+
+    let showPopup = false;
+
+	const onShowPopup = (event) => {
+		showPopup = true;
+	}
+
+	const onPopupClose = (data) => {
+		showPopup = false;
+
+		console.log(data);
+	}
+
+    checkingTab()
 </script>
 
 <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0">
+    <MatchingAddModal  open={showPopup} onClosed={(data) => onPopupClose(data)} userId={userId} number={number}>
+      <h2 style="text-align: center;">매칭 요청이 들어왔습니다</h2>
+      <div style="text-align: center;">
+        고객 이름 : {userId} <br>
+        인원 수 : {number} 명
+      </div>
+	</MatchingAddModal>
+
+
     <div
         class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100"
         style="margin-left:-20px"
