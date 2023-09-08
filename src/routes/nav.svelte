@@ -1,9 +1,12 @@
 <script>
 	import manager from "../store/manager";
-  let managerInfo ;
-  manager.subscribe((obj)=>{
-    managerInfo = obj;
-  });
+  import cafe from "../store/cafe"
+  let cafeInfo;
+
+  cafe.subscribe((obj)=>{
+    cafeInfo = obj;
+  })
+
   let matchOpen = false;
   $: console.log(matchOpen)
 </script>
@@ -22,11 +25,11 @@
         <div class="d-flex" role="">
           <div class="row g-0">
             <div class="col">
-                <h5 class="card-title text-end fs-5" >{managerInfo.cafeName}</h5>
+                <h5 class="card-title text-end fs-5" >{cafeInfo.name}</h5>
                 <p class="card-text text-end fs-6">Open</p>
             </div>
             <div class="col-md-3 ms-3">
-                <img alt="profile" class="rounded-circle mt-1" src={managerInfo.cafeImg}/>
+                <img alt="profile" class="rounded-circle mt-1" src={cafeInfo.imageUrl}/>
             </div>
           </div>
           
