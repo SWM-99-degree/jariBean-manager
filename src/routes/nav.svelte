@@ -6,7 +6,6 @@
   cafe.subscribe((obj)=>{
     cafeInfo = obj;
   })
-
   let matchOpen = false;
   $: console.log(matchOpen)
 </script>
