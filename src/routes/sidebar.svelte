@@ -28,6 +28,7 @@
     let userId;
     let number;
     let token;
+    let check = false;
 
     onMount(async () => {
         const app = initializeApp(firebaseConfig);
@@ -70,27 +71,39 @@
             } else if (payload.data.type === "matchingComplete") {
                 progressing.complete(payload.data.userId);
             }
+            Queue.enqueue(payload.notification.title, payload.notification.body);
+            console.log(check);
+            checkingTab();
         });
 
     });
-    function sleep(ms) {
-        const wakeUpTime = Date.now() + ms;
-        while (Date.now() < wakeUpTime) {}
-    }
+    
+    let showPopup = false;
 
-    function checkingTab(){
-        while (Queue.isempty() == false)  {
+    function delay(ms) {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+    });
+}
+
+
+    async function checkingTab(){
+        if (Queue.isempty() === true) {
+            return ;
+        } else {
             Queue.dequeue();
             let q;
-            matching.subscribe((obj)=> q = obj)
+            matching.subscribe((obj)=> q = obj);
             console.log(q);
-            userId = q.userid;
             number = q.number;
+            userId = q.userid;
+            await delay(2000);
             while (showPopup) {
-                sleep(1000)
-                continue;
+                await delay(5000);
+                console.log(showPopup);
             }
             onShowPopup();
+            console.log(showPopup);
             console.log("loof end");
         }
     }
@@ -114,7 +127,6 @@
         window.localStorage.setItem("sentToServer", sent ? "1" : "0");
     }
 
-    let showPopup = false;
 
 	const onShowPopup = (event) => {
 		showPopup = true;

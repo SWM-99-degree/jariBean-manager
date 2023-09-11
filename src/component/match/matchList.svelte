@@ -26,7 +26,6 @@
   
   progressing.subscribe((obj) => {matchList = obj;});
   
-
  
   let value = 0
   
