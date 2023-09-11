@@ -4,9 +4,10 @@
     let value = 0;
     export let max = 100;
     export let times;
+    export let status;
     
     let date = new Date();
-    let maxTime =  date - new Date().setMinutes(date.getMinutes() + 5)
+    let maxTime =  date - new Date().setMinutes(date.getMinutes() + 10)
   
     $: progressPath = () => {
       if (value <= 0) {
@@ -46,6 +47,7 @@
         clearInterval(interval);
       };
     });
+    console.log(status)
   </script>
   
   <style>
@@ -75,15 +77,27 @@
       top: 50%;
       transform: translate(-50%, -50%);
     }
+    button {
+      border: none;
+      background-color: rgba(0,0,0,0);
+    }
   </style>
-  <div  style="width:60px;height:60px;--progress-color: {progressColor}">
+  <div style="width:60px;height:60px;--progress-color: {progressColor}">
     <svg viewBox="0 0 100 100">
       <path d="M50,5A45 45 0 1 1 49.9999 5" />
       <path d="{progressPath()}" />
     </svg>
     <div>
       <slot>
+        {#if status === "cancel"}
+        <span>취소</span>
+        {:else if status === "complete"}
+        <span>완료</span>
+        {:else if Math.floor(diffSec / 60).toString().padStart(2, '0') >= 0 && (diffSec-Math.round(diffMin *60)).toString().padStart(2,'0') >= 0}
         <span> {Math.floor(diffSec / 60).toString().padStart(2, '0')}:{(diffSec-Math.round(diffMin *60)).toString().padStart(2,'0')} </span>
+        {:else}
+        <span><button onclick="">No Show</button></span>
+        {/if}
       </slot>
     </div>
   </div>

@@ -1,6 +1,7 @@
 <script>
     import { fade, fly } from "svelte/transition";
     import { quintOut } from "svelte/easing";
+    import { progressing } from "../store/matching";
   
     export let open = false;
     export let showBackdrop = true;
@@ -19,13 +20,13 @@
         sendDeleteRequest()
       }
     }
-
+    // TODO
     async function sendDeleteRequest() {
       const data = {
           'peopleNumber' : Number(number),
           'userId' : userId
         };
-      const response = await fetch('url', {
+      const response = await fetch('http://13.125.35.24:3000/api/matching/cafe', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json',
@@ -36,7 +37,7 @@
       if (response.ok) {
         const data = await response.json(); // JSON 응답을 파싱
         console.log('서버 응답:', data);
-        // 여기에서 추가로 처리할 내용을 작성할 수 있습니다.
+        progressing.enqueue(data.data["matchingId"], userId, Number(number));
       } else {
         sendDeleteRequest()
         throw new Error('매칭 요청 실패');

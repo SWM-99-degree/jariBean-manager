@@ -6,6 +6,7 @@
         faCircle,
     } from "@fortawesome/free-solid-svg-icons";
     import { Queue, matching } from "../store/requestQueue";
+    import { progressing } from "../store/matching";
     import currentToken from "../store/firebase";
     import { onMount } from "svelte";
     import { initializeApp } from "firebase/app";
@@ -27,6 +28,7 @@
     let userId;
     let number;
     let token;
+
     onMount(async () => {
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
@@ -58,10 +60,16 @@
 
         onMessage(messaging, (payload) => {
             console.log("Message received. ", payload);
-            Queue.enqueue(payload.notification.title, payload.notification.body);
-            checkingTab();
-            // onShowPopup();
-            // 알림을 생성하거나 사용자 정의 로직을 수행합니다.
+            if (payload.data.type === "matchingRequest") {
+                Queue.enqueue(payload.data.userId, payload.notification.peopleNumber);
+                checkingTab();
+            } else if (payload.data.type === "matchingCancelBeforeMatching"){
+                progressing.dequeue(payload.data.userId);
+            } else if (payload.data.type === "matchingCancelAfterMatching") {
+                progressing.cancel(payload.data.userId);
+            } else if (payload.data.type === "matchingComplete") {
+                progressing.complete(payload.data.userId);
+            }
         });
 
     });
@@ -78,7 +86,10 @@
             console.log(q);
             userId = q.userid;
             number = q.number;
-            sleep(5000);
+            while (showPopup) {
+                sleep(1000)
+                continue;
+            }
             onShowPopup();
             console.log("loof end");
         }
@@ -111,7 +122,6 @@
 
 	const onPopupClose = (data) => {
 		showPopup = false;
-
 		console.log(data);
 	}
 
@@ -122,7 +132,7 @@
     <MatchingAddModal  open={showPopup} onClosed={(data) => onPopupClose(data)} userId={userId} number={number}>
       <h2 style="text-align: center;">매칭 요청이 들어왔습니다</h2>
       <div style="text-align: center;">
-        고객 이름 : {userId} <br>
+        고객 아이디 : {userId} <br>
         인원 수 : {number} 명
       </div>
 	</MatchingAddModal>
