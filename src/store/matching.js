@@ -1,15 +1,7 @@
 import  { writable, get } from 'svelte/store'
 
 let map = new Map();
-let info = new Map();
-info.set('userid', "123");
-info.set('number', "123");
-info.set('matchingid', "123")
-let time = new Date();
-time.setMinutes(time.getMinutes()+1);
-info.set('status', "complete");
-info.set('time', time);
-map.set("123", info);
+
 
 const progressingQueue = writable(map);
 export const progressing = {
@@ -19,14 +11,19 @@ export const progressing = {
     isempty: () => {
         return get(progressingQueue).size === 0;
     },
-    enqueue: (matchingid, userid, num) => progressingQueue.update((Q) => {
+    enqueue: (matchingid, userid, num, name, time=null) => progressingQueue.update((Q) => {
         let info = new Map();
-        let time = new Date();
-        time.setMinutes(time.getMinutes() + 10);
+        console.log(time);
+        if (time === null) {
+            time = new Date();
+            time.setMinutes(time.getMinutes() + 10);
+        }
+        console.log(time);
         info.set('matchingid', matchingid)
         info.set('userid', userid);
         info.set('number', num);
         info.set('time', time);
+        info.set('name', name)
         info.set('status', "progress")
         Q.set(matchingid, info);
         console.log(Q);

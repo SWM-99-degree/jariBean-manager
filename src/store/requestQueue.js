@@ -15,9 +15,8 @@ export const Queue = {
                 return false;
             }
         },
-        enqueue: (id, num) => requestQueue.update((Q) => {
-            Q.push({ userid : id, number : num })
-            console.log(Q);
+        enqueue: (id, num, name) => requestQueue.update((Q) => {
+            Q.push({ userid : id, number : num, name: name })
             return Q;
         }),
         dequeue: () => requestQueue.update((Q) => {
