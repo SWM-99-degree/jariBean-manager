@@ -6,11 +6,13 @@
         faCircle,
     } from "@fortawesome/free-solid-svg-icons";
     import { Queue, matching } from "../store/requestQueue";
+    import { progressing } from "../store/matching";
     import currentToken from "../store/firebase";
     import { onMount } from "svelte";
     import { initializeApp } from "firebase/app";
     import { getMessaging, getToken, onMessage } from "firebase/messaging";
     import MatchingAddModal from '../component/matchingAddModal.svelte';
+    import { json } from "@sveltejs/kit";
     
 
 
@@ -23,10 +25,13 @@
         appId: "1:508384819940:web:f14eda8ab95a047e19caf1",
         measurementId: "G-CQJ8KGXR9L",
     };
-
+    
     let userId;
     let number;
     let token;
+    let username;
+    let check = false;
+
     onMount(async () => {
         const app = initializeApp(firebaseConfig);
         const messaging = getMessaging(app);
@@ -36,9 +41,15 @@
         })
             .then((token) => {
                 if (token) {
-                    console.log(token);
                     token = token;
                     currentToken.set(token);
+                    if (token) {
+                        console.log(token);
+                        sendTokenToServer(token);
+                    } else {
+                        setTokenSentToServer(false);
+                    }
+
                 } else {
                     console.log(
                         "No registration token available. Request permission to generate one."
@@ -46,52 +57,82 @@
                 }
             })
             .catch((err) => {
-                console.log("An error occurred while retrieving token. ", err);
+                console.log("An error occurred while retrieving token.", err);
             });
-
-        if (token) {
-            console.log(token);
-            sendTokenToServer(token);
-        } else {
-            setTokenSentToServer(false);
-        }
 
         onMessage(messaging, (payload) => {
             console.log("Message received. ", payload);
-            Queue.enqueue(payload.notification.title, payload.notification.body);
+            if (payload.data.type === "matchingRequest") {
+                Queue.enqueue(payload.data.userId, payload.data.peopleNumber, payload.data.username);
+                checkingTab();
+            } else if (payload.data.type === "matchingCancelBeforeMatching"){
+                progressing.dequeue(payload.data.userId);
+            } else if (payload.data.type === "matchingCancelAfterMatching") {
+                progressing.cancel(payload.data.userId);
+            } else if (payload.data.type === "matchingComplete") {
+                progressing.complete(payload.data.userId);
+            }
+            Queue.enqueue(payload.notification.body,payload.notification.title, payload.notification.body)
+            // Queue.enqueue(payload.notification.title, payload.notification.body);
+            // console.log(check);
             checkingTab();
-            // onShowPopup();
-            // 알림을 생성하거나 사용자 정의 로직을 수행합니다.
         });
 
     });
-    function sleep(ms) {
-        const wakeUpTime = Date.now() + ms;
-        while (Date.now() < wakeUpTime) {}
+    
+    let showPopup = false;
+
+
+    // 비동기 통신
+    function delay(ms) {
+        return new Promise(resolve => {
+            setTimeout(resolve, ms);
+    });
     }
 
-    function checkingTab(){
-        while (Queue.isempty() == false)  {
+
+    async function checkingTab(){
+        if (Queue.isempty() === true) {
+            return ;
+        } else {
+            await delay(2000);
+            while (showPopup) {
+                await delay(5000);
+                console.log(showPopup);
+            }
             Queue.dequeue();
             let q;
-            matching.subscribe((obj)=> q = obj)
+            matching.subscribe((obj)=> q = obj);
             console.log(q);
-            userId = q.userid;
             number = q.number;
-            sleep(5000);
+            userId = q.userid;
+            username = q.name;
             onShowPopup();
+            console.log(showPopup);
             console.log("loof end");
         }
     }
     
 
     function sendTokenToServer(currentToken) {
-        if (!isTokenSentToServer()) {
+        if (!isTokenSentToServer() && currentToken != false) {
             console.log("Sending token to server...");
-            // TODO(developer): Send the current token to your server.
+            let data = {
+                    'firebaseToken' : currentToken
+            }
+            const response = fetch('http://localhost:8080/api/fcm/token', {
+                method : 'PUT',
+                headers : {
+                    'Content-type' : 'application/json',
+                    'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken')
+                },
+                body : JSON.stringify(data)
+            });
+        if (response.ok) {
             setTokenSentToServer(true);
         } else {
-            console.log("Token already available in the server");
+            console.log("Token not in server");
+        }
         }
     }
 
@@ -103,15 +144,16 @@
         window.localStorage.setItem("sentToServer", sent ? "1" : "0");
     }
 
-    let showPopup = false;
 
 	const onShowPopup = (event) => {
 		showPopup = true;
+        setTimeout(() => {
+        onPopupClose();
+            }, 10000);
 	}
 
 	const onPopupClose = (data) => {
 		showPopup = false;
-
 		console.log(data);
 	}
 
@@ -119,10 +161,10 @@
 </script>
 
 <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0">
-    <MatchingAddModal  open={showPopup} onClosed={(data) => onPopupClose(data)} userId={userId} number={number}>
+    <MatchingAddModal  open={showPopup} onClosed={(data) => onPopupClose(data)} userId={userId} username={username} number={number}>
       <h2 style="text-align: center;">매칭 요청이 들어왔습니다</h2>
       <div style="text-align: center;">
-        고객 이름 : {userId} <br>
+        고객 아이디 : {username} <br>
         인원 수 : {number} 명
       </div>
 	</MatchingAddModal>

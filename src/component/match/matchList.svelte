@@ -1,33 +1,81 @@
 <script>
 	import Timer from './timer.svelte';
   import { onMount } from 'svelte';
+  import { progressing } from '../../store/matching';
+  import { matching } from '../../store/requestQueue';
+  
 	
-    let date = new Date();
-    let date2 = new Date();
+  onMount(async () => {
+    const response = await fetch('http://localhost:8080/api/matching/progressing', {
+      method : 'GET',
+      headers : {
+        // for CORS 
+        'Access-Control-Allow-Origin': 'http://localhost:5173',
+        'Content-Type': 'application/json',
+        'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
+      }
+    });
+    console.log('하기 싫다.');
+    if (response.ok) {
+      let data = await response.json();
+      data = data.data
+      console.log(data);
 
-    let matchList =[
-        {
-            title : "스터디용 2",
-            name : "김xx",
-            person : 2,
-            reservTime : '10:30~12:30',
-            matchTime : date.setMinutes(date.getMinutes() + 5)
-        },
-        {
-            title : "회의용 1",
-            name : "박xx",
-            person : 3,
-            reservTime : '10:30~12:30',
-            matchTime : date2.setSeconds(date.getSeconds() + 10)
+      data.forEach(element => {
+      progressing.enqueue(element.id, element.userId, element.seating, element.name, element.startTime)
+    });
     }
-    ]    
+  });
+
+  let date = new Date();
+  // let date2 = new Date();
+
+    // {
+    //         title : "스터디용 2",
+    //         name : "김xx",
+    //         person : 2,
+    //         reservTime : '10:30~12:30',
+    //         matchTime : date.setMinutes(date.getMinutes() + 5)
+    //     },
+    //     {
+    //         title : "회의용 1",
+    //         name : "박xx",
+    //         person : 3,
+    //         reservTime : '10:30~12:30',
+    //         matchTime : date2.setSeconds(date.getSeconds() + 10)
+    // }
+  let matchList;
+  
+  progressing.subscribe((obj) => {matchList = obj;});
+  
  
-    
-    
+  let value = 0
+
+  // 완료요청
+  async function completeMatching(matchingId) {
+      progressing.dequeue(matchingId);
+      const data = {
+          'matchingId' : matchingId,
+        };
+      const response = await fetch('http://13.125.35.24:3000/api/matching/complete', {
+        method : 'PUT',
+        headers : {
+          'Access-Control-Allow-Origin': 'http://localhost:5173',
+          'Content-Type': 'application/json',
+          'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
+        },
+        body : JSON.stringify(data)
+      });
+      if (response.ok) {
+        const data = await response.json(); // JSON 응답을 파싱
+        console.log('서버 응답:', data);
+        progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
+      } else {
+        throw new Error('매칭 요청 실패');
+      }
+  }
   
-    let value = 0
-  
-    onMount(() => {
+  onMount(() => {
 		const interval = setInterval(() => {
 			date = new Date();
             value = value +10
@@ -39,28 +87,41 @@
 	});
 </script>
 <div class="table_list card p-3">
-    <h4>매칭 정보</h4>   
-    {#each matchList as match  }
-    <div class=" card mb-3 border-0 bg-light p-1"  >
+    <h4>매칭 정보</h4>
+    {#each Array.from(matchList.values()) as match }
+    <div class=" card mb-3 border-0 bg-light p-1">
         <div class="row g-0">
           <div class="col-md-3">
-          
             <div class="m-2">
-                <Timer max="100" times={ new Date(match.matchTime)} {value} />   
+                <Timer max="100" times={match.get("time")} status={match.get("status")} {value} /> 
             </div>
-    
           </div>
-          <div class="col-md-9 ">
+          <div class="col-md-7">
             <div class="card-body">
-              <h5 class="card-title fw-bold" role="button" >{match.title}</h5>
+              <h5 class="card-title fw-bold" role="button">{match.get('name')} 님과의 매칭 </h5> 
               <p class="card-text text-black-50 fw-bold">
-                <span>&#183;&nbsp;{match.person}인&nbsp;</span>
-                <span>&#183;&nbsp;{match.reservTime}&nbsp;</span>
+                <span>&#183;&nbsp;{match.get("number")} 인&nbsp;</span>
+                <span>&#183;&nbsp;{new Date(match.get("time")).toLocaleTimeString()}&nbsp;</span>
               </p>
               <!--<p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>-->
             </div>
+          </div>
+          <div class="col-md-2">
+            <button class="complete-button" on:click={()=> completeMatching(match.get("matchingid"))}>완료</button>
           </div>
         </div>
       </div>
     {/each}
 </div>
+
+<style>
+ .complete-button {
+  background-color: skyblue;
+  color: white;
+  padding: 2rem 0.5rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px; 
+ }
+
+</style>
