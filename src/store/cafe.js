@@ -1,4 +1,4 @@
 import  { writable } from 'svelte/store'
 
-const cafe = writable({})
-export default cafe
+export const cafe = writable({})
+export const storeTableClassList = writable([])

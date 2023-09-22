@@ -3,13 +3,26 @@
 
     import TableList from "../../../component/reserv/tableList.svelte";
     import TableDetail from "../../../component/reserv/tableDetail.svelte";
-    import manager from "../../../store/manager";
+    import {apiCall} from "../../../communal/communalMethod"
+    import selectdTable from "../../../store/reserv";
+    import { storeTableClassList } from "../../../store/cafe";
 
-    let manager_info ={
-        cafeName : "엔젤리너스",
-        cafeImg : "https://picsum.photos/40/40/"    
+    // table-class list 내용 조회
+    let cafeId;
+    if (typeof window !== "undefined") {
+        cafeId = localStorage.getItem("cafeId");
     }
-    manager.set(manager_info)
+
+    const response = apiCall("/manager/table-class/" + cafeId, "GET", null);
+    response
+        .then((data) => {
+            $storeTableClassList = data.data
+            selectdTable.set($storeTableClassList[0]);
+        })
+        .catch((error) => {
+            console.log("src > routes> management > reserve > +page.svelte > 테이블 클래스 조회: " + error);
+        });
+
 </script>
 
 <div class="row">
