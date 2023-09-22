@@ -1,18 +1,49 @@
 <script>
-    import { fade, fly } from "svelte/transition";
-    import { quintOut } from "svelte/easing";
-  
-    export let open = false;
-    export let showBackdrop = true;
-    export let onClosed;
-    export let title = 'Modal title';
-  
-    const modalClose = (data) => {
-      open = false;
-      if (onClosed) {
-        onClosed(data);
-      }
+  import { fade, fly } from "svelte/transition";
+  import { quintOut } from "svelte/easing";
+  import { apiCall } from "../../communal/communalMethod"
+  import { storeName, storeSeating, height, shape, concent, backrest } from "../../store/tableClass"
+  import { cafe } from "../../store/cafe";
+    import { subscribe } from "svelte/internal";
+
+  export let open = false;
+  export let showBackdrop = true;
+  export let onClosed;
+  export let title = 'Modal title';
+
+  const modalClose = (data) => {
+    open = false;
+    if (onClosed) {
+      onClosed(data);
     }
+  }
+
+  let name = '';
+  let seating = 0;
+
+  storeName.subscribe(value => {
+    name = value;
+  })
+  storeSeating.subscribe(value => {
+    seating = value;
+  })
+
+  function createTableClass() {
+    let option = [$height, $shape, $concent, $backrest].filter(value => value !== undefined && value !== '')
+    const response = apiCall("/manager/tableclass/" + $cafe.id, "POST", { name, seating, option})
+    response
+      .then((data) => {
+          console.log("success");
+          open = false
+      })
+      .catch((error) => {
+          console.log("error: " + error);
+          open = false
+      });
+  }
+
+
+
   
   </script>
   
@@ -30,8 +61,9 @@
             <slot></slot>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal" on:click={() => modalClose('close')}>Close</button>
-            <button type="button" class="btn btn-primary" on:click={() => modalClose('save')}>Save changes</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" on:click={() => modalClose('close')}>취소</button>
+            <button type="button" class="btn btn-primary" on:click={() => createTableClass()}>추가</button>
+            <!-- <button type="button" class="btn btn-primary" on:click={() => modalClose('save')}>추가</button> -->
           </div>
         </div>
       </div>
