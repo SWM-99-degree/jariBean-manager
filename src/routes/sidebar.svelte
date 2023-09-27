@@ -65,17 +65,23 @@
             if (payload.data.type === "matchingRequest") {
                 Queue.enqueue(payload.data.userId, payload.data.peopleNumber, payload.data.username);
                 checkingTab();
+                return
             } else if (payload.data.type === "matchingCancelBeforeMatching"){
                 progressing.dequeue(payload.data.userId);
+                return
             } else if (payload.data.type === "matchingCancelAfterMatching") {
                 progressing.cancel(payload.data.userId);
             } else if (payload.data.type === "matchingComplete") {
                 progressing.complete(payload.data.userId);
             }
-            Queue.enqueue(payload.notification.body,payload.notification.title, payload.notification.body)
-            // Queue.enqueue(payload.notification.title, payload.notification.body);
-            // console.log(check);
-            checkingTab();
+            const response = fetch('http://localhost:3000/api/fcm?loggindId=' + payload.data.loggindId, {
+                method : 'POST',
+                headers : {
+                    'Content-type' : 'application/json',
+                    'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken')
+                }
+            });
+
         });
 
     });
