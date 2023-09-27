@@ -1,10 +1,12 @@
 <script>
 // @ts-nocheck
     import { onMount } from 'svelte';
+    import { apiCall } from '../../communal/communalMethod';
     let value = 0;
     export let max = 100;
     export let times;
     export let status;
+    export let matchingId;
     
     let date = new Date();
     let maxTime =  date - new Date().setMinutes(date.getMinutes() + 10)
@@ -47,6 +49,21 @@
         clearInterval(interval);
       };
     });
+
+    async function sendNoShow(matchingId) {
+      const data = {
+        "matchingId" : matchingId
+      }
+      const response = await apiCall("/matching/noshow", "PUT", data);
+      response
+        .then((data) => {
+          progressing.dequeue(matchingId);
+        })
+        .catch((error) => {
+          console.log("error: " + error);
+      });
+
+    }
     console.log(status)
   </script>
   
@@ -96,7 +113,7 @@
         {:else if Math.floor(diffSec / 60).toString().padStart(2, '0') >= 0 && (diffSec-Math.round(diffMin *60)).toString().padStart(2,'0') >= 0}
         <span> {Math.floor(diffSec / 60).toString().padStart(2, '0')}:{(diffSec-Math.round(diffMin *60)).toString().padStart(2,'0')} </span>
         {:else}
-        <span><button onclick="">No Show</button></span>
+        <span><button on:click={()=>sendNoShow(matchingId)}>No Show</button></span>
         {/if}
       </slot>
     </div>

@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { progressing } from '../../store/matching';
   import { matching } from '../../store/requestQueue';
+    import { apiCall } from '../../communal/communalMethod';
   
 	
   onMount(async () => {
@@ -53,23 +54,14 @@
 
   // 완료요청
   async function completeMatching(matchingId) {
-      progressing.dequeue(matchingId);
       const data = {
           'matchingId' : matchingId,
         };
-      const response = await fetch('http://13.125.35.24:3000/api/matching/complete', {
-        method : 'PUT',
-        headers : {
-          'Access-Control-Allow-Origin': 'http://localhost:5173',
-          'Content-Type': 'application/json',
-          'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
-        },
-        body : JSON.stringify(data)
-      });
+      const response = await apiCall("/matching/complete", "PUT", data);
       if (response.ok) {
         const data = await response.json(); // JSON 응답을 파싱
         console.log('서버 응답:', data);
-        progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
+        progressing.dequeue(matchingId);
       } else {
         throw new Error('매칭 요청 실패');
       }
@@ -93,7 +85,7 @@
         <div class="row g-0">
           <div class="col-md-3">
             <div class="m-2">
-                <Timer max="100" times={match.get("time")} status={match.get("status")} {value} /> 
+                <Timer max="100" times={match.get("time")} status={match.get("status")} matchingId={match.get("matchingId")} {value} /> 
             </div>
           </div>
           <div class="col-md-7">

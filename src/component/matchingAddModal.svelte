@@ -2,6 +2,7 @@
     import { fade, fly } from "svelte/transition";
     import { quintOut } from "svelte/easing";
     import { progressing } from "../store/matching";
+    import { apiCall } from "../communal/communalMethod";
   
     export let open = false;
     export let showBackdrop = true;
@@ -23,25 +24,21 @@
     }
     // TODO
     async function sendAcceptResponse() {
+
       const data = {
           'peopleNumber' : Number(number),
           'userId' : userId
         };
-      const response = await fetch('https://api.:3000/api/matching/cafe', {
-        method : 'POST',
-        headers : {
-          'Content-Type': 'application/json',
-          'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
-        },
-        body : JSON.stringify(data)
+
+      const response = await apiCall("/matching/cafe", "POST", data);
+      response
+      .then((data) => {
+          console.log("success");
+          progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
+      })
+      .catch((error) => {
+          console.log("error: " + error);
       });
-      if (response.ok) {
-        const data = await response.json(); // JSON 응답을 파싱
-        console.log('서버 응답:', data);
-        progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
-      } else {
-        throw new Error('매칭 요청 실패');
-      }
     }
   
   </script>

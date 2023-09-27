@@ -23,8 +23,8 @@ export const progressing = {
         info.set('userid', userid);
         info.set('number', num);
         info.set('time', time);
-        info.set('name', name)
-        info.set('status', "progress")
+        info.set('name', name);
+        info.set('status', "progress");
         Q.set(matchingid, info);
         console.log(Q);
         return Q;
