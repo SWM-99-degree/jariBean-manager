@@ -23,26 +23,25 @@
     }
     // TODO
     async function sendAcceptResponse() {
-      progressing.enqueue(userId, userId, Number(number), username, null);
-      // const data = {
-      //     'peopleNumber' : Number(number),
-      //     'userId' : userId
-      //   };
-      // const response = await fetch('http://13.125.35.24:3000/api/matching/cafe', {
-      //   method : 'POST',
-      //   headers : {
-      //     'Content-Type': 'application/json',
-      //     'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
-      //   },
-      //   body : JSON.stringify(data)
-      // });
-      // if (response.ok) {
-      //   const data = await response.json(); // JSON 응답을 파싱
-      //   console.log('서버 응답:', data);
-      //   progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
-      // } else {
-      //   throw new Error('매칭 요청 실패');
-      // }
+      const data = {
+          'peopleNumber' : Number(number),
+          'userId' : userId
+        };
+      const response = await fetch('https://api.:3000/api/matching/cafe', {
+        method : 'POST',
+        headers : {
+          'Content-Type': 'application/json',
+          'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
+        },
+        body : JSON.stringify(data)
+      });
+      if (response.ok) {
+        const data = await response.json(); // JSON 응답을 파싱
+        console.log('서버 응답:', data);
+        progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
+      } else {
+        throw new Error('매칭 요청 실패');
+      }
     }
   
   </script>
