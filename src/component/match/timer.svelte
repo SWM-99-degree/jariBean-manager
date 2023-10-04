@@ -1,13 +1,16 @@
 <script>
 // @ts-nocheck
     import { onMount } from 'svelte';
+    import { progressing } from '../../store/matching';
     let value = 0;
     export let max = 100;
     export let times;
     export let status;
+    export let matchingId;
     
     let date = new Date();
-    let maxTime =  date - new Date().setMinutes(date.getMinutes() + 10)
+    let maxTime =  date - new Date().setMinutes(date.getMinutes() + 10);
+    
   
     $: progressPath = () => {
       if (value <= 0) {
@@ -47,7 +50,31 @@
         clearInterval(interval);
       };
     });
-    console.log(status)
+    console.log(status);
+
+    async function noShowMatching(matchingId) {
+      console.log(matchingId);
+      progressing.dequeue(matchingId);
+      const data = {
+          'matchingId' : matchingId,
+      };
+      const response = await fetch('http://13.125.35.24:3000/api/matching/noshow', {
+        method : 'PUT',
+        headers : {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+          'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
+        },
+        body : JSON.stringify(data)
+      });
+      if (response.ok) {
+        const data = await response.json(); // JSON 응답을 파싱
+        console.log('서버 응답:', data);
+        // progressing.enqueue(data.data["matchingId"], userId, Number(number), username);
+      } else {
+        throw new Error('매칭 요청 실패');
+      }
+  }
   </script>
   
   <style>
@@ -96,7 +123,7 @@
         {:else if Math.floor(diffSec / 60).toString().padStart(2, '0') >= 0 && (diffSec-Math.round(diffMin *60)).toString().padStart(2,'0') >= 0}
         <span> {Math.floor(diffSec / 60).toString().padStart(2, '0')}:{(diffSec-Math.round(diffMin *60)).toString().padStart(2,'0')} </span>
         {:else}
-        <span><button onclick="">No Show</button></span>
+        <span><button on:click={()=>noShowMatching(matchingId)}>No Show</button></span>
         {/if}
       </slot>
     </div>

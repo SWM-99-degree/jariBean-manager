@@ -6,16 +6,15 @@
   
 	
   onMount(async () => {
-    const response = await fetch('http://localhost:8080/api/matching/progressing', {
+    const response = await fetch('http://13.125.35.24:8080/api/matching/progressing', {
       method : 'GET',
       headers : {
         // for CORS 
-        'Access-Control-Allow-Origin': 'http://localhost:5173',
+        'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json',
         'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
       }
     });
-    console.log('하기 싫다.');
     if (response.ok) {
       let data = await response.json();
       data = data.data
@@ -28,22 +27,6 @@
   });
 
   let date = new Date();
-  // let date2 = new Date();
-
-    // {
-    //         title : "스터디용 2",
-    //         name : "김xx",
-    //         person : 2,
-    //         reservTime : '10:30~12:30',
-    //         matchTime : date.setMinutes(date.getMinutes() + 5)
-    //     },
-    //     {
-    //         title : "회의용 1",
-    //         name : "박xx",
-    //         person : 3,
-    //         reservTime : '10:30~12:30',
-    //         matchTime : date2.setSeconds(date.getSeconds() + 10)
-    // }
   let matchList;
   
   progressing.subscribe((obj) => {matchList = obj;});
@@ -60,7 +43,7 @@
       const response = await fetch('http://13.125.35.24:3000/api/matching/complete', {
         method : 'PUT',
         headers : {
-          'Access-Control-Allow-Origin': 'http://localhost:5173',
+          'Access-Control-Allow-Origin': '*',
           'Content-Type': 'application/json',
           'ACCESS_AUTHORIZATION' : localStorage.getItem('accessToken'),
         },
@@ -93,7 +76,7 @@
         <div class="row g-0">
           <div class="col-md-3">
             <div class="m-2">
-                <Timer max="100" times={match.get("time")} status={match.get("status")} {value} /> 
+                <Timer max="100" times={match.get("time")} status={match.get("status")} matchingId={match.get("matchingid")} {value} /> 
             </div>
           </div>
           <div class="col-md-7">
