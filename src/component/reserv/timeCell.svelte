@@ -5,7 +5,8 @@
 style="border-left:5px solid {border};
             background: {background};
             height:100%;
-            padding-left:5px;">
+            padding-left:5px;
+            margin-right:5px">
     {name}<br/>
-    {time}
+    <p style="color: #999999; font-size: 18px">{time}</p>
 </div>
