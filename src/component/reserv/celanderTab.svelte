@@ -17,7 +17,6 @@
     response
         .then((data) => {
             reserveList = data.data
-            console.log(JSON.stringify(reserveList));
             tableIdList = Object.keys(reserveList);
         })
         .catch((error) => {

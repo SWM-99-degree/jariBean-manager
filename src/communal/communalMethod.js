@@ -1,9 +1,10 @@
 export async function apiCall(endPoint, httpMethod, data) {
 
-    const url = "http://13.125.35.24:8080/api"
+    const url = "https://api.jari-bean.com/api"
     let accessToken;
 
     // you'll need to wait until the page has been mounted on the client prior to accessing localStorage
+    
     if (typeof window !== "undefined") {
         accessToken = localStorage.getItem("accessToken");
     }
@@ -19,14 +20,14 @@ export async function apiCall(endPoint, httpMethod, data) {
     };
 
     try {
-        const response = await fetch(url + endPoint, requestOptions);
+        console.log("[REQ] " + url + endPoint);
 
+        const response = await fetch(url + endPoint, requestOptions);
         if (!response.ok) {
             throw new Error("ERROR!!")
         }
-
         return await response.json()
     } catch (error) {
-        console.error("에러 발생:", error);
+        console.error("[ERROR] " + url + endPoint + " 요청에 오류가 발생하였습니다.(" + error +")");
     }
 }

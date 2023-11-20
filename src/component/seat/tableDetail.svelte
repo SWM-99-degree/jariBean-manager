@@ -1,6 +1,8 @@
 <script>
+    import { faImage } from "@fortawesome/free-solid-svg-icons";
   import { apiCall } from "../../communal/communalMethod.js";
   import selectdTable from "../../store/reserv.js";
+    import Fa from "svelte-fa";
 
   let tableClass = {};
   let tableList = [];
@@ -53,7 +55,7 @@
                   {#if table.image}
                     <img
                       class="rounded-circle"
-                      style="width: 70px;"
+                      style="width: 70px; height: 70px"
                       src={table.image}
                       alt={table.image}
                     />

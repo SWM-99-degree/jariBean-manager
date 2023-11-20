@@ -39,7 +39,7 @@
                 <div class="col-2">
                     <div class="m-3 bg-white rounded-circle position-relative" role="button" style="width: 70px;height:70px">
                     {#if reserve}
-                        <img class="rounded-circle" style="width: 70px;" src={reserve.name} alt={reserve.name}/>
+                        <img class="rounded-circle" style="width: 70px; height: 70px" src={reserve.name} alt={reserve.name}/>
                     {:else}
                         <Fa class="text-light position-absolute top-50 start-50 translate-middle" icon={faImage} size="2x"/>
                     {/if}
