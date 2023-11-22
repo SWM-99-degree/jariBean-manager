@@ -127,7 +127,7 @@
                     'firebaseToken' : currentToken
             }
             console.log(localStorage.getItem('accessToken'));
-            const response = fetch('http://13.125.35.24:8080/api/fcm/token', {
+            const response = fetch('https://api.jari-bean.com/api/fcm/token', {
                 method : 'PUT',
                 headers : {
                     'Content-type' : 'application/json',
