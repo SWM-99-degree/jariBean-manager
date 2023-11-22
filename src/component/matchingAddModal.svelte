@@ -27,7 +27,7 @@
           'peopleNumber' : Number(number),
           'userId' : userId
         };
-      const response = await fetch('http://13.125.35.24:3000/api/matching/cafe', {
+      const response = await fetch('https://api.jari-bean.com/api/matching/cafe', {
         method : 'POST',
         headers : {
           'Content-Type': 'application/json',

@@ -58,7 +58,7 @@
       const data = {
           'matchingId' : matchingId,
       };
-      const response = await fetch('http://13.125.35.24:3000/api/matching/noshow', {
+      const response = await fetch('https://api.jari-bean.com/api/matching/noshow', {
         method : 'PUT',
         headers : {
           'Access-Control-Allow-Origin': '*',

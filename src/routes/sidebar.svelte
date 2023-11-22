@@ -74,7 +74,7 @@
             } else if (payload.data.type === "matchingComplete") {
                 progressing.complete(payload.data.userId);
             }
-            const response = fetch('http://localhost:3000/api/fcm?loggindId=' + payload.data.loggindId, {
+            const response = fetch('https://api.jari-bean.com/api/fcm?loggindId=' + payload.data.loggindId, {
                 method : 'POST',
                 headers : {
                     'Content-type' : 'application/json',
