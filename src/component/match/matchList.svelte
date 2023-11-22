@@ -6,7 +6,9 @@
   
 	
   onMount(async () => {
+
     const response = await fetch('https://api.jari-bean.com/api/match/progressing', {
+
       method : 'GET',
       headers : {
         // for CORS 
