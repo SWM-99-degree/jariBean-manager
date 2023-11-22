@@ -13,11 +13,13 @@
         cafeId = localStorage.getItem("cafeId");
     }
 
-    const response = apiCall("/manager/table-class/" + cafeId, "GET", null);
+    const response = apiCall("/manager/tableclass/" + cafeId, "GET", null);
+
     response
         .then((data) => {
             $storeTableClassList = data.data
             selectdTable.set($storeTableClassList[0]);
+            console.log("src > routes> management > reserve > +page.svelte > 테이블 클래스 조회: " + selectdTable);
         })
         .catch((error) => {
             console.log("src > routes> management > reserve > +page.svelte > 테이블 클래스 조회: " + error);

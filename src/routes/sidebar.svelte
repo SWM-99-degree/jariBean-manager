@@ -205,9 +205,9 @@
             >
                 <a
                     href="/management/match"
-                    class="nav-link align-middle fs-4 px-0"
+                    class="nav-link ms-4 align-middle fs-4 px-0"
                 >
-                    <Fa class="text-light" icon={faCircle} />
+                    <Fa icon={faCircle} />
                     <span class="ms-1 text-black-50 d-none d-sm-inline"
                         >매칭</span
                     >
@@ -219,9 +219,9 @@
             >
                 <a
                     href="/management/seat"
-                    class="nav-link align-middle fs-4 px-0"
+                    class="nav-link ms-4 align-middle fs-4 px-0"
                 >
-                    <Fa class="text-light" icon={faCircle} />
+                    <Fa icon={faCalendarCheck} />
                     <span class="ms-1 text-black-50 d-none d-sm-inline"
                         >좌석</span
                     >

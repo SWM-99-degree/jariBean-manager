@@ -48,7 +48,7 @@
             {#if tableClass.name}
               <img
                 class="rounded-circle"
-                style="width: 70px;"
+                style="width: 70px; height: 70px"
                 src={tableClass.image}
                 alt={tableClass.name}
               />
