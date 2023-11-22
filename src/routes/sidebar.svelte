@@ -126,7 +126,8 @@
             let data = {
                     'firebaseToken' : currentToken
             }
-            const response = fetch('http://localhost:8080/api/fcm/token', {
+            console.log(localStorage.getItem('accessToken'));
+            const response = fetch('http://13.125.35.24:8080/api/fcm/token', {
                 method : 'PUT',
                 headers : {
                     'Content-type' : 'application/json',
